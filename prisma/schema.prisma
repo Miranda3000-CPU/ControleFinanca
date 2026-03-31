@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PurchaseCategory {
+  ALIMENTACAO
+  MORADIA
+  TRANSPORTE
+  SAUDE
+  EDUCACAO
+  LAZER
+  ASSINATURAS
+  OUTROS
+}
+
+enum PaymentType {
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  PIX
+  DINHEIRO
+  TRANSFERENCIA
+  BOLETO
+}
+
+enum EntryType {
+  GASTO
+  GANHO
+}
+
+model Purchase {
+  id              String           @id @default(cuid())
+  purchaseDate    DateTime         @db.Date
+  product         String
+  category        PurchaseCategory
+  paymentType     PaymentType
+  entryType       EntryType        @default(GASTO)
+  amountInCents   Int              @default(0)
+  receiptBase64 String?
+  receiptMimeType String?
+  receiptFileName String?
+  receiptSize     Int?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([purchaseDate, createdAt])
+  @@index([category, paymentType])
+  @@index([entryType, purchaseDate])
+}
